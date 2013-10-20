@@ -11,14 +11,17 @@ from accuracyTools import calculateAccuracy
 
 # this part has the main script!
 # I hate this that there is no indicator. no divider mechanism
-folder = '/mnt/hgfs/mouse_brain/20130506-interareal_mag4/ccout/whole_ilp8/'
+#folder = '/mnt/hgfs/mouse_brain/20130506-interareal_mag4/ccout/whole_ilp8/'
+folder = '/mnt/hgfs/mouse_brain/20130506-interareal_mag4/ccout/paper_results/'
 #folder = '/mnt/hgfs/mouse_brain/tests/'
 #featureFile = folder+'dtmask_th_50_a1000.h5_fea.h5'
 
-featureFile = folder+'cc_th_50_detectionbb_mxlabel_all_regionProps.matcc_processed_th_1000_non_edge_matlab_fea.h5'
+#featureFile = folder+'cc_th_50_detectionbb_mxlabel_all_regionProps.matcc_processed_th_1000_non_edge_matlab_fea.h5'
+featureFile = folder+'cc_th_50.h5all_region_props_vth1_25cc_processed_th_1000_nonedge_matlab_fea.h5'
 #featureFile = folder+'labels.h5_fea.h5'
 
-labelFile = folder+'cc_th_50_detectionbb_mxlabel_all_regionProps.matcc_processed_th_1000_non_edge_training_labels.h5'
+#labelFile = folder+'cc_th_50_detectionbb_mxlabel_all_regionProps.matcc_processed_th_1000_non_edge_training_labels.h5'
+labelFile = folder+'cc_th_50.h5all_region_props_vth1_25cc_processed_th_1000_nonedge_training_labels.h5'
 #labelFile = folder+'new.h5'
 #trainingDataSetNames = ['count',
 #'histogram', 
@@ -38,26 +41,26 @@ labelFile = folder+'cc_th_50_detectionbb_mxlabel_all_regionProps.matcc_processed
 trainingDataSetNames = ['Volume', 'CentroidNorm', 'Perimeter','Complexity',
  'BoundingBox2Volume','BoundingBoxAspectRatio', #, 'BoundingBoxAspectRatio',
    'IntensityHist'] #CloseMassRatio]#'BoundingBoxAspectRatio']#, 'IntensityMax','IntensityMean',
-
-numpy.random.seed(100)
+random_seed = 100
+numpy.random.seed(random_seed)
 print numpy.random.rand(1,1)
 repeatN = 100
-acc = numpy.zeros([repeatN, 2])
+acc = numpy.zeros([repeatN, 3])
 allFeatures = FeatureSet.readFromFile(featureFile, trainingDataSetNames,labelFile, 'labels')
 coordinateFeatures = FeatureSet.readFromFile(featureFile,['Centroid'] ,labelFile, 'labels')
 predThreshold = 0.5
 for ite in range(0,repeatN):
-    
-   # trn, val = allFeatures.divideSetRandom(1,1,True)
-    trn, val = allFeatures.divideSetByZ(coordinateFeatures.data[:,2])
+    #trn, val = allFeatures.divideSetRandom(1,1,True, verbose=True)
+    trn, val = allFeatures.divideSetByZ(coordinateFeatures.data[:,2], verbose=True)
 #    trn, val = allFeatures.divideSetByZ(allFeatures.data[:,allFeatures.featureNames=='regionCenter'])
     # parameters
-    partreeCount = 50
+    partreeCount =50
     
     rf = vigra.learning.RandomForest(treeCount=partreeCount)
     #print "Type traindata = ", trn.data.dtype, "Type labels=", trn.labels.dtype,'\n'
     #print "shape Train data = ", numpy.shape(trn.data), '\n'
-    rf.learnRF(trn.data, trn.labels)
+    rf.learnRF(trn.data, trn.labels, randomSeed = ite*10)
+    
     #itefileName = labelFile+"forest_%.3d.h5" % ite
     #itefileName = labelFile+"forest_%.3d.h5" % ite
     #rf.writeHDF5(itefileName)
@@ -74,7 +77,7 @@ for ite in range(0,repeatN):
 print acc
 print "Mean acc = ", numpy.mean(acc,0), '\n'
 print "Std acc = ", numpy.std(acc,0),'\n'
-writeResults = 1
+writeResults =0
 # calculate prediction for all
 p = rf.predictProbabilities(allFeatures.data)
 predclasspositive = p[:,1]

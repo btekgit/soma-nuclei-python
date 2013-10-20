@@ -30,6 +30,6 @@ def calculateAccuracy(pred,th, gt,labels=None, verbose=False):
     sumFalsePositive = sum(falsePositive)
     if(verbose):
         print "True Positive =", sumTruePositive, "False Positive = ", sumFalsePositive
-    #results = numpy.array([sumTruePositive/float(numPositiveGT), sumTruePositive/float(numPositiveDT)])
-    results = numpy.array([sumTruePositive/float(numPositiveGT), sumFalsePositive])
+    results = numpy.array([sumTruePositive/float(numPositiveGT), sumFalsePositive, sumTruePositive/float(numPositiveDT)])
+    #results = numpy.array([sumTruePositive/float(numPositiveGT), sumFalsePositive])
     return results

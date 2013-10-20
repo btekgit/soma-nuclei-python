@@ -16,6 +16,7 @@ class FeatureSet(object):
         h5file = h5py.File(labelFile, 'r')
         h5data = h5file[labelDataSet]
         rowlength = len(h5data)
+        print rowlength
         
         #self.labels = numpy.uint32(numpy.squeeze(h5data[...]))
         labels = numpy.zeros([rowlength,1], dtype=numpy.uint32)
@@ -62,9 +63,10 @@ class FeatureSet(object):
                     
             
             print "dataSet Dims = ", fdim, ", Shape = ", siz,'\n'
+            #dim0 = siz[0]
             #if size is not correct transpose it
             
-            if(fdim==2 & siz[0]!=rowlength):
+            if((fdim==2) & (siz[0]!=rowlength)):
                 print "transposing", siz, " shaped columns"
                 newfeaturecolumns = numpy.transpose(newfeaturecolumns)
                 siz = numpy.shape(newfeaturecolumns)
@@ -141,6 +143,8 @@ class FeatureSet(object):
         f2 = FeatureSet(data2,label2,index2, self.featureNames,self.featureIndexes)
         if(verbose):
             print "Input feature set of ", sampleNum, " rows is divided into two parts:", len(index1), " and ", len(index2), " samples" ,"\n"
+            print "part 1 has ", numpy.sum(label1==1),"positive and", numpy.sum(label1==0),"negative sampples"
+            print "part 2 has ", numpy.sum(label2==1),"positive and", numpy.sum(label2==0),"negative sampples"
         return f1,f2
     
     def divideSetByZ(self,coordinateZ, verbose=False):
@@ -190,4 +194,6 @@ class FeatureSet(object):
         f2 = FeatureSet(data2,label2,index2, self.featureNames,self.featureIndexes)
         if(verbose):
             print "Input feature set of ", sampleNum, " rows is divided into two parts:", len(index1), " and ", len(index2), " samples" ,"\n"
+            print "part 1 has ", numpy.sum(label1==1),"positive and", numpy.sum(label1==0),"negative sampples"
+            print "part 2 has ", numpy.sum(label2==1),"positive and", numpy.sum(label2==0),"negative sampples"
         return f1,f2
